@@ -1,0 +1,15 @@
+{
+  "name": "applejr-legacy-signer",
+  "version": "1.0.0",
+  "description": "iPad 4 / Safari 10 compatible IPA signing frontend and Express server backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1"
+  },
+  "author": "Antigravity",
+  "license": "ISC"
+}

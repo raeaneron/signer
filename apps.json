@@ -1,0 +1,18 @@
+[
+  {
+    "title": "test_app",
+    "bundleId": "com.applejr.legacy.signedapp",
+    "version": "1.0",
+    "installUrl": "itms-services://?action=download-manifest&url=http%3A%2F%2Flocalhost%3A3000%2Fuploads%2Fsigned%2Fmanifest-1779519867772.plist",
+    "downloadUrl": "http://localhost:3000/uploads/signed/signed-1779519865263-test_app.ipa",
+    "timestamp": 1779519867774
+  },
+  {
+    "title": "socket",
+    "bundleId": "com.applejr.legacy.signedapp",
+    "version": "1.0",
+    "installUrl": "itms-services://?action=download-manifest&url=http%3A%2F%2Flocalhost%3A3000%2Fuploads%2Fsigned%2Fmanifest-1779520909207.plist",
+    "downloadUrl": "http://localhost:3000/uploads/signed/signed-1779520906701-socket.ipa",
+    "timestamp": 1779520909246
+  }
+]

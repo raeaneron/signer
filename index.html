@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Ensure proper scale on iPad 4 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <title>AppleJr IPA Signer & Library</title>
+  
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+
+  <div class="container">
+    
+    <header>
+      <h1>AppleJr IPA Signer</h1>
+      <p>Sign and install your IPA files directly onto your iPad 4</p>
+    </header>
+
+    <!-- Top Tab Navigation -->
+    <div class="tab-nav">
+      <button class="tab-btn active" id="btnSigner" data-target="signerTab">🚀 IPA Signer</button>
+      <button class="tab-btn" id="btnLibrary" data-target="libraryTab">📚 App Library</button>
+    </div>
+
+    <!-- Signer Tab Panel -->
+    <div id="signerTab" class="tab-panel active">
+      <form id="uploadForm" method="POST" enctype="multipart/form-data">
+        
+        <!-- IPA Upload Drop Zone -->
+        <label>📦 Upload IPA File</label>
+        <div class="drop-zone" id="dropZone">
+          <div class="drop-zone-text" id="dropZoneText">📥 Tap here or drag IPA file</div>
+          <div class="drop-zone-subtext">Supports .ipa files up to 250MB</div>
+        </div>
+        <input type="file" name="ipa_file" id="ipa_file" accept=".ipa" required style="display: none;">
+
+        <!-- Certificate Selection Toggle -->
+        <div class="toggle-group">
+          <span class="toggle-label">🔐 Custom Certificate (.p12)</span>
+          <label class="switch">
+            <input type="checkbox" id="certToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Server Certificate Selector (Default) -->
+        <div id="serverCertSection">
+          <label for="use_server_cert">📁 Select Certificate from Server</label>
+          <select name="use_server_cert" id="use_server_cert">
+            <option value="">-- Choose Certificate --</option>
+            <option value="Aramco Services Company">1. Aramco Services Company</option>
+            <option value="XL AXIATA, PT TBK">2. XL AXIATA, PT TBK</option>
+            <option value="National Oilwell">3. National Oilwell</option>
+            <option value="Qingdao">4. Qingdao</option>
+            <option value="VIETNAM AIRLINES">5. VIETNAM AIRLINES</option>
+            <option value="China Academy">6. China Academy</option>
+            <option value="Forevermark">7. Forevermark</option>
+            <option value="Atianjin">8. Atianjin</option>
+            <option value="Commission on Elections">9. Commission on Elections</option>
+          </select>
+          
+          <div class="notice-box">
+            🌏 <strong>AppleJr DNS Config Required:</strong> To bypass verify errors when installing, please install the <a href="https://d1yei2z3i6k35z.cloudfront.net/14890634/68f7bbc35c7c2_signed_AppleJrV22.mobileconfig" target="_blank">AppleJr Anti-Revoke Profile</a>.
+          </div>
+        </div>
+
+        <!-- Manual Certificate Uploads -->
+        <div id="manualCertSection" style="display: none;">
+          <div class="file-input-group">
+            <label for="p12_file">🔑 Certificate file (.p12)</label>
+            <input type="file" name="p12_file" id="p12_file" accept=".p12">
+          </div>
+
+          <div class="file-input-group">
+            <label for="mobileprovision_file">📄 Mobile Provisioning Profile (.mobileprovision)</label>
+            <input type="file" name="mobileprovision_file" id="mobileprovision_file" accept=".mobileprovision">
+          </div>
+
+          <div class="file-input-group">
+            <label for="password">🔒 Certificate Password</label>
+            <input type="password" name="password" id="password" placeholder="Password of the certificate">
+          </div>
+        </div>
+
+        <!-- Add to Public Library Checkbox -->
+        <div class="toggle-group">
+          <span class="toggle-label">🌐 Save to Public App Library</span>
+          <label class="switch">
+            <input type="checkbox" name="save_to_library" id="saveToLibrary" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Sign Action Button -->
+        <button type="submit" id="submitBtn">🚀 Sign IPA File</button>
+
+        <!-- Loader & Progress status -->
+        <div id="loader">⏳ Resigning application binaries...</div>
+        <div id="progressBar">
+          <div id="progressFill"></div>
+        </div>
+        <div id="progressText"></div>
+
+        <!-- Status Message Area -->
+        <div id="statusMessage" class="status-msg"></div>
+
+        <!-- Dynamic Installation Success Buttons -->
+        <div class="result-buttons" id="resultBtns">
+          <a id="installLink" href="#" class="btn btn-install">📲 Direct Install App</a>
+          <a id="downloadLink" href="#" class="btn btn-download" target="_blank">⬇️ Download Signed IPA</a>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- App Library Tab Panel -->
+    <div id="libraryTab" class="tab-panel">
+      
+      <!-- Library Search -->
+      <div class="search-box">
+        <input type="text" id="librarySearch" placeholder="🔍 Search saved apps...">
+      </div>
+<form id="libraryUploadForm" method="POST" enctype="multipart/form-data">
+  <input type="file" name="ipa_file" accept=".ipa" required style="margin-top:10px;" />
+  <button type="submit">Upload to Library</button>
+  <div id="libraryUploadStatus" style="display:none;"></div>
+</form>
+
+      <!-- App Grid Container (Flexbox for iOS 10) -->
+      <div class="app-grid" id="appGrid">
+        <!-- Dynanically populated cards will go here -->
+        <div class="loading-msg">⏳ Loading library applications...</div>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  <script src="/assets/js/script.js"></script>
+</body>
+</html>
