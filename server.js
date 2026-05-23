@@ -123,6 +123,70 @@ app.get('/api/apps', (req, res) => {
   res.json({ success: true, apps: sortedApps });
 });
 
+// API endpoint to delete an app from the library registry and disk
+app.post('/api/apps/delete', (req, res) => {
+  const timestamp = Number(req.body.timestamp);
+  if (!timestamp) {
+    return res.status(400).json({ success: false, message: 'Missing timestamp' });
+  }
+
+  const db = getAppsDatabase();
+  const appIndex = db.findIndex(app => app.timestamp === timestamp);
+
+  if (appIndex === -1) {
+    return res.status(404).json({ success: false, message: 'App not found in registry' });
+  }
+
+  const app = db[appIndex];
+  
+  // Resolve filenames
+  let ipaFilename = app.ipaFilename;
+  if (!ipaFilename && app.downloadUrl) {
+    ipaFilename = path.basename(app.downloadUrl);
+  }
+
+  let plistFilename = app.plistFilename;
+  if (!plistFilename && app.installUrl) {
+    const match = app.installUrl.match(/url=([^&]+)/);
+    if (match) {
+      const plistUrl = decodeURIComponent(match[1]);
+      plistFilename = path.basename(plistUrl);
+    }
+  }
+
+  // Delete files
+  if (ipaFilename) {
+    const ipaPath = path.join(signedDir, ipaFilename);
+    if (fs.existsSync(ipaPath)) {
+      try {
+        fs.unlinkSync(ipaPath);
+        console.log(`Deleted physical IPA: ${ipaPath}`);
+      } catch (err) {
+        console.error(`Error deleting physical IPA:`, err);
+      }
+    }
+  }
+
+  if (plistFilename) {
+    const plistPath = path.join(signedDir, plistFilename);
+    if (fs.existsSync(plistPath)) {
+      try {
+        fs.unlinkSync(plistPath);
+        console.log(`Deleted physical Plist: ${plistPath}`);
+      } catch (err) {
+        console.error(`Error deleting physical Plist:`, err);
+      }
+    }
+  }
+
+  // Remove from database registry
+  db.splice(appIndex, 1);
+  saveAppsDatabase(db);
+
+  res.json({ success: true, message: 'App deleted successfully' });
+});
+
+
 // Upload & Sign POST route
 app.post('/upload', (req, res) => {
   upload(req, res, (err) => {
@@ -239,6 +303,8 @@ function finishSigningResponse(outputFilename, appTitle, protocol, host, saveToL
       version: appVersion,
       installUrl: installUrl,
       downloadUrl: ipaDownloadUrl,
+      ipaFilename: outputFilename,
+      plistFilename: plistFilename,
       timestamp: Date.now()
     });
     saveAppsDatabase(db);

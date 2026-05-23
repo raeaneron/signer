@@ -344,6 +344,7 @@
           '<div class="app-actions">' +
             '<a href="' + app.installUrl + '" class="btn btn-install">📲 Install</a>' +
             '<a href="' + app.downloadUrl + '" class="btn btn-download" target="_blank">⬇️ IPA</a>' +
+            '<button class="btn btn-delete" data-timestamp="' + app.timestamp + '">🗑️ Delete</button>' +
           '</div>' +
         '</div>';
         
@@ -391,5 +392,51 @@
 
   // Trigger initial fetch when page loads (just in case they land directly on tabs)
   fetchLibrary();
+
+  // --- Delete Application ---
+  if (appGrid) {
+    appGrid.addEventListener("click", function (e) {
+      var target = e.target;
+      while (target && target !== appGrid) {
+        if (target.classList && target.classList.contains("btn-delete")) {
+          var timestamp = target.getAttribute("data-timestamp");
+          if (timestamp && confirm("Are you sure you want to delete this app?")) {
+            deleteApp(timestamp);
+          }
+          break;
+        }
+        target = target.parentNode;
+      }
+    });
+  }
+
+  function deleteApp(timestamp) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/api/apps/delete", true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    
+    xhr.onload = function () {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          var res = JSON.parse(xhr.responseText);
+          if (res && res.success) {
+            fetchLibrary();
+          } else {
+            alert(res.message || "Failed to delete application.");
+          }
+        } catch (err) {
+          alert("Failed to delete application. Server returned invalid response.");
+        }
+      } else {
+        alert("Server error: Status " + xhr.status);
+      }
+    };
+    
+    xhr.onerror = function () {
+      alert("Network error trying to connect to server.");
+    };
+    
+    xhr.send(JSON.stringify({ timestamp: Number(timestamp) }));
+  }
 
 })();

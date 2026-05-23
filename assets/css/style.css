@@ -368,6 +368,17 @@ button:active {
   background-color: rgba(255, 255, 255, 0.15);
 }
 
+.btn-delete {
+  background-color: rgba(255, 59, 48, 0.15);
+  color: #ff3b30;
+  border: 1px solid rgba(255, 59, 48, 0.3);
+}
+
+.btn-delete:hover {
+  background-color: rgba(255, 59, 48, 0.25);
+}
+
+
 /* Progress Area */
 #loader {
   display: none;
@@ -580,8 +591,17 @@ button:active {
 
 .app-actions .btn-install {
   margin-bottom: 0;
-  margin-right: 8px; /* Margin instead of grid-gap */
+  margin-right: 6px; /* Margin instead of grid-gap */
 }
+
+.app-actions .btn-download {
+  margin-right: 6px;
+}
+
+.app-actions .btn-delete {
+  margin-right: 0;
+}
+
 
 /* Loading/Error states inside lists */
 .loading-msg, .no-apps-msg {
