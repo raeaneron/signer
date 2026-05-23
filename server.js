@@ -75,6 +75,11 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Health check endpoint for Render/hosting platforms
+app.get('/healthz', (req, res) => {
+  res.status(200).send('OK');
+});
+
 // Helper function to build Plist XML manifest for itms-services
 function generatePlist(ipaUrl, bundleId, title, version = '1.0') {
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -149,16 +154,18 @@ app.post('/upload', (req, res) => {
     const p12File = req.files['p12_file'] ? req.files['p12_file'][0] : null;
     const provFile = req.files['mobileprovision_file'] ? req.files['mobileprovision_file'][0] : null;
 
+    // Use local zsign binary if compiled in project root (for platforms like Render)
+    const zsignBin = fs.existsSync(path.join(__dirname, 'zsign')) ? './zsign' : 'zsign';
     let zsignCommand = '';
     
     if (p12File && provFile) {
-      zsignCommand = `zsign -k "${p12File.path}" -p "${password}" -m "${provFile.path}" -o "${signedIpaPath}" "${ipaFile.path}"`;
+      zsignCommand = `${zsignBin} -k "${p12File.path}" -p "${password}" -m "${provFile.path}" -o "${signedIpaPath}" "${ipaFile.path}"`;
     } else if (useServerCert) {
       const localCertPath = path.join(__dirname, 'certs', `${useServerCert}.p12`);
       const localProvPath = path.join(__dirname, 'certs', `${useServerCert}.mobileprovision`);
       
       if (fs.existsSync(localCertPath) && fs.existsSync(localProvPath)) {
-        zsignCommand = `zsign -k "${localCertPath}" -p "123456" -m "${localProvPath}" -o "${signedIpaPath}" "${ipaFile.path}"`;
+        zsignCommand = `${zsignBin} -k "${localCertPath}" -p "123456" -m "${localProvPath}" -o "${signedIpaPath}" "${ipaFile.path}"`;
       }
     }
 
